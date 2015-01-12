@@ -2,20 +2,23 @@ local map
 local temp_map
 local cell_color = {127, 210, 255}
 local bg_color = {0, 0, 0}
-local SIZE = 100		--Size of the array of true/false values
+local SIZE = 130		--Size of the array of true/false values
 local RECT_SIZE = 5		--Size of rectangles in pixels
-local LUCK = 0.55		--The probability of a cell starting out as alive
-local FPS = 15
+local FPS = 5
 
 function love.load()
+	min_dt = 1/FPS
+	next_time = love.timer.getTime()
+
 	--Initialize map
+	math.randomseed(os.time())
 	map = {}
 	temp_map = {}
 	for i = 0, SIZE do
 		map[i] = {}
 		temp_map[i] = {}
 		for j = 0, SIZE do
-			map[i][j] = math.random() > LUCK and true or false
+			map[i][j] = math.random() > 0.55
 		end
 	end
 
@@ -26,6 +29,8 @@ function love.load()
 end
 
 function love.update(dt)
+	next_time = next_time + min_dt
+
 	for i = 0, SIZE do
 		for j = 0, SIZE do
 			if map[i][j] == true then
@@ -56,15 +61,10 @@ function love.update(dt)
 			map[i][j] = temp_map[i][j]
 		end
 	end
-
-	--Cap framerate so simulation doesn't run super fast
-	if dt < 1/FPS*2 then
-		love.timer.sleep(1/FPS*2 - dt)
-	end
 end
 
 function count_alive(i, j)
-	count = 0
+	local count = 0
 	if i < SIZE and map[i + 1][j] == true then
 		count = count + 1
 	end
@@ -101,6 +101,14 @@ function love.draw()
 			end
 		end
 	end
+
+	--Delay if we finished drawing this frame faster than desired FPS
+	local cur_time = love.timer.getTime()
+	if next_time <= cur_time then
+		next_time = cur_time
+		return
+	end
+	love.timer.sleep(next_time - cur_time)
 end
 
 function love.keyreleased(key)

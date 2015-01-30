@@ -2,7 +2,7 @@ local map
 local temp_map
 local cell_color = {127, 210, 255}
 local bg_color = {0, 0, 0}
-local SIZE = 75		--Size of the array of true/false values
+local SIZE = 70		--Size of the array of true/false values
 local RECT_SIZE = 10		--Size of rectangles in pixels
 local FPS = 60
 local SIMULATION_SPEED = 10
@@ -40,12 +40,17 @@ function love.load()
 	love.graphics.setColor(cell_color)
 
 	canvas = love.graphics.newCanvas()
-	blurred_canvas = love.graphics.newCanvas()
-	blur = love.graphics.newShader('blur.frag')
-	blur:send('radius', 3)
-	blur:send('width', love.window.getWidth())
-	blur:send('height', love.window.getHeight())
-	love.graphics.setBlendMode('premultiplied')
+
+	vertical_blurred_canvas = love.graphics.newCanvas()
+	vertical_blur = love.graphics.newShader('vertical_blur.frag')
+	vertical_blur:send('r', 5)
+	vertical_blur:send('h', love.window.getHeight())
+
+	horizontal_blurred_canvas = love.graphics.newCanvas()
+	horizontal_blur = love.graphics.newShader('horizontal_blur.frag')
+	horizontal_blur:send('r', 5)
+	horizontal_blur:send('w', love.window.getWidth())
+	love.graphics.setBlendMode('screen')
 
 	love.mouse.setVisible(false)
 end
@@ -139,7 +144,8 @@ end
 
 function love.draw()
 	canvas:clear()
-	blurred_canvas:clear()
+	vertical_blurred_canvas:clear()
+	horizontal_blurred_canvas:clear()
 	love.graphics.setCanvas(canvas)
 	for i = 0, SIZE do
 		for j = 0, SIZE do
@@ -151,13 +157,18 @@ function love.draw()
 
 	love.graphics.rectangle("line", prev_frame_x * RECT_SIZE, prev_frame_y * RECT_SIZE, RECT_SIZE, RECT_SIZE)
 
-	love.graphics.setCanvas(blurred_canvas)
-	love.graphics.setShader(blur)
+	love.graphics.setCanvas(horizontal_blurred_canvas)
+	love.graphics.setShader(horizontal_blur)
 	love.graphics.draw(canvas, 0, 0)
+
+	love.graphics.setCanvas(vertical_blurred_canvas)
+	love.graphics.setShader(vertical_blur)
+	love.graphics.draw(horizontal_blurred_canvas, 0, 0)
+
 	love.graphics.setShader()
 	love.graphics.setCanvas()
 	love.graphics.draw(canvas, 0, 0)	
-	love.graphics.draw(blurred_canvas, 0, 0)
+	love.graphics.draw(vertical_blurred_canvas, 0, 0)
 
 	--Delay if we finished drawing this frame faster than desired FPS
 	local cur_time = love.timer.getTime()
@@ -168,7 +179,7 @@ function love.draw()
 	love.timer.sleep(next_time - cur_time)
 end
 
-function love.keyreleased(key)
+function love.keypressed(key)
 	if key == "escape" then
 		love.event.quit()
 	elseif key == "r" then

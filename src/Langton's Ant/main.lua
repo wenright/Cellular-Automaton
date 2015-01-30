@@ -137,9 +137,11 @@ function love.keyreleased(key)
 		for i = 0, SIZE do
 			for j = 0, SIZE do
 				map[i][j] = false
-				temp_map[i][j] = false
 			end
 		end
+
+		ant_x = math.floor(SIZE / 2)
+		ant_y = math.floor(SIZE / 2)
 	elseif key == '.' then
 		if SIMULATION_SPEED > 1 then
 			SIMULATION_SPEED  = SIMULATION_SPEED - 1

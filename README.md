@@ -11,7 +11,7 @@
 ![Conway's Game Of Life](http://i.imgur.com/gugQneb.gif)
 
 # [Brian's Brain](http://en.wikipedia.org/wiki/Brian%27s_Brain)
-<img src="http://i.imgur.com/pQySZ5a.gif" alt="Brian's Brain" style="width: 50%; height: 50%;"/>
+<img src="http://i.imgur.com/pQySZ5a.gif" alt="Brian's Brain" width=360 height=360 />
 
 # [Langton's Ant](http://en.wikipedia.org/wiki/Langton's_ant)
 ![Langton's Ant](http://i.imgur.com/T3mdiAe.gif)
